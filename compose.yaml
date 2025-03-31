@@ -1,0 +1,30 @@
+name: kto
+
+volumes:
+  kse:
+  ksp:
+
+services:
+  search:
+    image: kse:v1
+    container_name: rec-1
+    volumes:
+      - kse:/app
+    ports:
+      - 6333:6333
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['3']
+              capabilities: [ gpu ]
+
+  web:
+    image: ksp:v1
+    container_name: rec-2
+    volumes:
+      - ksp:/app
+    ports:
+      - 10080:8501
+    command: tail -f /dev/null

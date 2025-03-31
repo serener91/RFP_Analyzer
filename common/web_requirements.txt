@@ -1,0 +1,10 @@
+streamlit
+openai
+orjson
+qdrant-client
+fastembed-gpu
+pandas
+fastapi
+uvicorn
+gunicorn
+sentence-transformers
