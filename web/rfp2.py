@@ -80,6 +80,7 @@ async def process_pdf_async():
 
     st.session_state.relevant_pages = list(set(budget_ids + time_ids + mar_ids + sfr_ids))
 
+
 # Function to process PDF
 def process_pdf():
     with st.spinner("Processing your PDF"):
