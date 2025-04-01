@@ -23,12 +23,16 @@ import os
 
 load_dotenv(r"C:\Users\gukhwan\OneDrive - (주)스위트케이\바탕 화면\ChatRFP\monitoring\.env")
 
+client = AsyncOpenAI(
+    api_key=os.getenv("OPENAI_API_KEY", None),
+)
+
 
 async def inference_async(gpt=False, system_msg="", query="", model="gpt-4o-mini", temperature=0.2):
     if gpt:
-        client = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY", None),
-        )
+        # client = AsyncOpenAI(
+        #     api_key=os.getenv("OPENAI_API_KEY", None),
+        # )
 
         message = [
             {"role": "system", "content": system_msg},
@@ -73,17 +77,19 @@ import time
 
 st = time.time()
 
-# Check if there's an existing event loop and use it
-try:
-    # checks if an event loop is already running.
-    loop = asyncio.get_running_loop()
-except RuntimeError:
-    # creates a new event loop if there is no loop
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+asyncio.run(run_app())
 
-#  runs the async function in the event loop
-res = loop.run_until_complete(run_app())
+# # Check if there's an existing event loop and use it
+# try:
+#     # checks if an event loop is already running.
+#     loop = asyncio.get_running_loop()
+# except RuntimeError:
+#     # creates a new event loop if there is no loop
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#
+# #  runs the async function in the event loop
+# res = loop.run_until_complete(run_app())
 
 # res1 = inference(gpt=True, system_msg=fetch_prompt("budget_extractor"), query=budget_texts)
 # res2 = inference(gpt=True, system_msg=fetch_prompt("time_extractor"), query=time_texts)
