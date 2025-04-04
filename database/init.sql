@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS documents (
     relevant_pages TEXT,
     model_response TEXT,
     model_name VARCHAR(50),
-    time_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    FOREIGN KEY (model_name) REFERENCES documents(model_name) -- ensures that the model_name in the documents table must exist in the models table.
+    time_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (model_name) REFERENCES models(model_name) -- ensures that the model_name in the documents table must exist in the models table.
 );

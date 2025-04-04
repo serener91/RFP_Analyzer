@@ -12,18 +12,67 @@ load_dotenv()
 
 st.set_page_config(layout="wide")
 
-with st.sidebar:
-    uploaded_file = st.file_uploader('Upload your PDF', type="pdf")
-    if uploaded_file is not None:
-        st.markdown(f"Uploaded PDF:\n\n{uploaded_file.name}")
-
 # Initialize session state
-if "show_columns" not in st.session_state:
-    st.session_state.show_columns = False
+if "analyze" not in st.session_state:
+    st.session_state.analyze = False
 if "summary" not in st.session_state:
     st.session_state.summary = None
 if "relevant_pages" not in st.session_state:
     st.session_state.relevant_pages = []
+if "files_name" not in st.session_state:
+    st.session_state.files_name = []
+if "files" not in st.session_state:
+    st.session_state.files = {}
+if "review" not in st.session_state:
+    st.session_state.review = False
+
+
+def fetch_review():
+    st.session_state.review = not st.session_state.review
+
+
+with st.sidebar:
+    uploaded_file = st.file_uploader('Upload your PDF', type="pdf")
+    if uploaded_file is not None:
+        # st.markdown(f"Uploaded PDF:\n\n{uploaded_file.name}")
+        if uploaded_file.name not in st.session_state.files_name:
+            st.session_state.files_name.append(uploaded_file.name)
+            st.session_state.files.update({uploaded_file.name: uploaded_file})
+
+    option = st.selectbox(
+        "Choose Documents to review",
+        st.session_state.files_name,
+        index=None,
+        placeholder="Select Document"
+    )
+    # st.write("You selected:\n", option)
+
+    if option is not None:
+        st.button(
+            label="Clear" if st.session_state.review else "View",
+            on_click=fetch_review,
+            icon=":material/mood:" if st.session_state.review else "😃",
+            use_container_width=True
+        )
+
+if st.session_state.review:
+    col1, col2 = st.columns(2, gap="large", border=True)
+
+    with col1:
+        st.header("Summary")
+        st.html(st.session_state.summary)  # DB에서 가져오기
+
+    with col2:
+        st.header("PDF")
+        try:
+            pdf_viewer(
+                st.session_state.files.get(option, None).getvalue(), # DB에서 가져오기
+                width=800,
+                pages_to_render=[int(i) for i in st.session_state.relevant_pages] # DB에서 가져오기
+            )
+
+        except AttributeError:
+            fetch_review()
 
 
 # Define an async inference function
@@ -133,22 +182,23 @@ def process_pdf():
 
 # Function to toggle columns and process PDF if needed
 def toggle_columns():
-    if not st.session_state.show_columns:
+    if not st.session_state.analyze:
         # process_pdf()  # Process only when enabling columns
         asyncio.run(process_pdf_async())  # Process only when enabling columns
-    st.session_state.show_columns = not st.session_state.show_columns
+    st.session_state.analyze = not st.session_state.analyze
 
 
 # Button to trigger processing
-st.button(
-    label="Clear" if st.session_state.show_columns else "Analyze",
-    on_click=toggle_columns,
-    icon=":material/mood:" if st.session_state.show_columns else "😃",
-    use_container_width=True
-)
+if st.session_state.review is False:
+    st.button(
+        label="Clear" if st.session_state.analyze else "Analyze",
+        on_click=toggle_columns,
+        icon=":material/mood:" if st.session_state.analyze else "😃",
+        use_container_width=True
+    )
 
 # Show columns if processing is complete
-if st.session_state.show_columns and st.session_state.summary:
+if st.session_state.analyze and st.session_state.review is False:
     col1, col2 = st.columns(2, gap="large", border=True)
 
     with col1:
