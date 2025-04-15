@@ -1,7 +1,6 @@
 import streamlit as st
 from openai import OpenAI
-
-from common.utils import parse_config, get_character, convert_to_sentences, db_pipeline
+from search_engine.utils import parse_config, get_character, convert_to_sentences, db_pipeline
 from dotenv import load_dotenv
 import os
 

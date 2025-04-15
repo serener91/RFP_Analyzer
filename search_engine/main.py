@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
 
-from common.utils import db_pipeline, convert_to_sentences
+from utils import db_pipeline, convert_to_sentences
 
 app = FastAPI(
-    title="ChatPDF",
+    title="SearchPDF",
     version="0.1.0",
     docs_url=None,
     redoc_url="/docs"

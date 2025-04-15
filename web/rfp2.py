@@ -1,14 +1,8 @@
 import streamlit as st
 from streamlit_pdf_viewer import pdf_viewer
 from common.pdf_extract import get_relevant_texts, extract_pdf
-from common.utils import inference, fetch_prompt, convert_to_html
+from common.utils import inference, fetch_prompt, convert_to_html, ainference
 import asyncio
-from openai import AsyncOpenAI
-from dotenv import load_dotenv
-import os
-
-
-load_dotenv()
 
 st.set_page_config(layout="wide")
 
@@ -75,30 +69,6 @@ if st.session_state.review:
             fetch_review()
 
 
-# Define an async inference function
-async def inference_async(gpt=False, system_msg="", query="", model="gpt-4o-mini", temperature=0.2):
-    if gpt:
-        client = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY", None),
-        )
-
-        message = [
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": query}
-        ]
-
-        # Await the response
-        chat_response = await client.chat.completions.create(
-            model=model,
-            messages=message,
-            temperature=temperature,
-            max_completion_tokens=8192,
-            stream=False
-        )
-
-        return chat_response.choices[0].message.content
-
-
 async def process_pdf_async():
     with st.spinner("Processing your PDF"):
 
@@ -112,10 +82,10 @@ async def process_pdf_async():
 
         # allows all inference_async calls to run in parallel,
         budget_info, time_info, mar_text, sfr_text = await asyncio.gather(
-            inference_async(gpt=True, system_msg=fetch_prompt("budget_extractor"), query=budget_texts),
-            inference_async(gpt=True, system_msg=fetch_prompt("time_extractor"), query=time_texts),
-            inference_async(gpt=True, model="gpt-4o", system_msg=fetch_prompt("mar_summary"), query=mar_points),
-            inference_async(gpt=True, model="gpt-4o", system_msg=fetch_prompt("sfr_summary"), query=sfr_points),
+            ainference(gpt=True, system_msg=fetch_prompt("budget_extractor"), query=budget_texts),
+            ainference(gpt=True, system_msg=fetch_prompt("time_extractor"), query=time_texts),
+            ainference(gpt=True, model="gpt-4o", system_msg=fetch_prompt("mar_summary"), query=mar_points),
+            ainference(gpt=True, model="gpt-4o", system_msg=fetch_prompt("sfr_summary"), query=sfr_points),
         )
 
     with st.spinner("Summing up"):
@@ -130,7 +100,6 @@ async def process_pdf_async():
     st.session_state.relevant_pages = list(set(budget_ids + time_ids + mar_ids + sfr_ids))
 
 
-# Function to process PDF
 def process_pdf():
     with st.spinner("Processing your PDF"):
 
