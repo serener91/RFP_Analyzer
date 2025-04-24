@@ -12,7 +12,7 @@
 - **PDF Viewer with Highlighted Pages**: Displays the original PDF with navigation to pages containing relevant information.
 - **Multi-Document Support**: Manage and review multiple uploaded documents within the interface.
 
-## Folder & File Structure
+## Project Structure
 
 - `web/rfp2.py`  
   Main Streamlit application providing the web interface for PDF upload, analysis, and result display.
